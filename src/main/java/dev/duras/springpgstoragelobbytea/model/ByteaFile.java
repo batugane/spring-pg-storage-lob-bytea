@@ -15,15 +15,15 @@ public class ByteaFile {
     @Column(name = "file_data")
     private byte[] data;
 
-    // Constructors
-    public ByteaFile() {}
+
+    public ByteaFile() {
+    }
 
     public ByteaFile(String filename, byte[] data) {
         this.filename = filename;
         this.data = data;
     }
 
-    // Getters & Setters
     public Long getId() {
         return id;
     }
