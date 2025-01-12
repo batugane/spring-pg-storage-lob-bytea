@@ -5,7 +5,6 @@ import dev.duras.springpgstoragelobbytea.model.ByteaFile;
 import dev.duras.springpgstoragelobbytea.model.LobFile;
 import dev.duras.springpgstoragelobbytea.repo.ByteaFileRepository;
 import dev.duras.springpgstoragelobbytea.repo.LobFileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,11 +18,16 @@ import java.io.IOException;
 @RequestMapping("/files")
 public class FileController {
 
-    @Autowired
-    private ByteaFileRepository byteaFileRepository;
 
-    @Autowired
-    private LobFileRepository lobFileRepository;
+    private final ByteaFileRepository byteaFileRepository;
+
+    private final LobFileRepository lobFileRepository;
+
+
+    public FileController(ByteaFileRepository byteaFileRepository, LobFileRepository lobFileRepository) {
+        this.byteaFileRepository = byteaFileRepository;
+        this.lobFileRepository = lobFileRepository;
+    }
 
     // -------------------------------
     // 1) Upload to BYTEA
