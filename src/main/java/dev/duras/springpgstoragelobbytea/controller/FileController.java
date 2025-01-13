@@ -1,10 +1,9 @@
 package dev.duras.springpgstoragelobbytea.controller;
 
-
 import dev.duras.springpgstoragelobbytea.model.ByteaFile;
 import dev.duras.springpgstoragelobbytea.model.LobFile;
-import dev.duras.springpgstoragelobbytea.repo.ByteaFileRepository;
-import dev.duras.springpgstoragelobbytea.repo.LobFileRepository;
+import dev.duras.springpgstoragelobbytea.service.ByteaFileService;
+import dev.duras.springpgstoragelobbytea.service.LobFileService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,49 +17,29 @@ import java.io.IOException;
 @RequestMapping("/files")
 public class FileController {
 
+    private final ByteaFileService byteaFileService;
+    private final LobFileService lobFileService;
 
-    private final ByteaFileRepository byteaFileRepository;
-
-    private final LobFileRepository lobFileRepository;
-
-
-    public FileController(ByteaFileRepository byteaFileRepository, LobFileRepository lobFileRepository) {
-        this.byteaFileRepository = byteaFileRepository;
-        this.lobFileRepository = lobFileRepository;
+    public FileController(ByteaFileService byteaFileService, LobFileService lobFileService) {
+        this.byteaFileService = byteaFileService;
+        this.lobFileService = lobFileService;
     }
 
-    // -------------------------------
-    // 1) Upload to BYTEA
-    // -------------------------------
     @PostMapping("/bytea")
     public ResponseEntity<String> uploadByteaFile(@RequestParam("file") MultipartFile file) throws IOException {
-        ByteaFile byteaFile = new ByteaFile();
-        byteaFile.setFilename(file.getOriginalFilename());
-        byteaFile.setData(file.getBytes());
-
-        ByteaFile saved = byteaFileRepository.save(byteaFile);
+        ByteaFile saved = byteaFileService.storeFile(file);
         return ResponseEntity.ok("Uploaded to BYTEA with ID: " + saved.getId());
     }
 
-    // -------------------------------
-    // 2) Upload to LOB
-    // -------------------------------
     @PostMapping("/lob")
     public ResponseEntity<String> uploadLobFile(@RequestParam("file") MultipartFile file) throws IOException {
-        LobFile lobFile = new LobFile();
-        lobFile.setFilename(file.getOriginalFilename());
-        lobFile.setData(file.getBytes());
-
-        LobFile saved = lobFileRepository.save(lobFile);
+        LobFile saved = lobFileService.storeFile(file);
         return ResponseEntity.ok("Uploaded to LOB with ID: " + saved.getId());
     }
 
-    // -------------------------------
-    // 3) Download from BYTEA
-    // -------------------------------
     @GetMapping("/bytea/{id}")
     public ResponseEntity<ByteArrayResource> downloadByteaFile(@PathVariable Long id) {
-        ByteaFile byteaFile = byteaFileRepository.findById(id)
+        ByteaFile byteaFile = byteaFileService.getFile(id)
                 .orElseThrow(() -> new RuntimeException("File not found with ID: " + id));
 
         ByteArrayResource resource = new ByteArrayResource(byteaFile.getData());
@@ -72,12 +51,9 @@ public class FileController {
                 .body(resource);
     }
 
-    // -------------------------------
-    // 4) Download from LOB
-    // -------------------------------
     @GetMapping("/lob/{id}")
     public ResponseEntity<ByteArrayResource> downloadLobFile(@PathVariable Long id) {
-        LobFile lobFile = lobFileRepository.findById(id)
+        LobFile lobFile = lobFileService.getFile(id)
                 .orElseThrow(() -> new RuntimeException("File not found with ID: " + id));
 
         ByteArrayResource resource = new ByteArrayResource(lobFile.getData());
