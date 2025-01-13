@@ -9,7 +9,7 @@ A minimal Spring Boot project demonstrating how to store and retrieve files from
 
 1. **Clone or download** this repository.
 2. **Configure** your PostgreSQL connection in `application.properties`.
-3. **Build and run** the Spring Boot app:
+3. **Build and run** the Spring Boot app.
 
 4. **Test** using [Postman](https://www.postman.com/downloads/) or `curl`:
     - **Upload to BYTEA**:
